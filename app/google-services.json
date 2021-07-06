@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "512518841473",
+    "firebase_url": "https://potatodiseasedetection-default-rtdb.firebaseio.com",
+    "project_id": "potatodiseasedetection",
+    "storage_bucket": "potatodiseasedetection.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:512518841473:android:e36e9e27be6251d5279980",
+        "android_client_info": {
+          "package_name": "com.app.potatodiseasedetection"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "512518841473-i5noqq27ghqb33hgk3bfoabgnl79omfg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrZfqHC_IxyNV_nEdxmOAVb4_TWGca5cE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "512518841473-i5noqq27ghqb33hgk3bfoabgnl79omfg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

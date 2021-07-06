@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/customTextEng"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/text_choose_eng"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:padding="10sp"/>
+
+    <TextView
+        android:id="@+id/customTextHindi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/text_choose_hindi"
+        android:gravity="center_horizontal"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:layout_marginTop="5dp"
+        android:padding="10sp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:padding="10sp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/customBtnEng"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_eng"
+            android:textSize="16sp"
+            android:layout_marginEnd="15dp"
+            android:padding="10sp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/customBtnHin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_hin"
+            android:textSize="16sp"
+            android:layout_marginStart="15dp"
+            android:padding="10sp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

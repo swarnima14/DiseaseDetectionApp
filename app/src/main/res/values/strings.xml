@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">PotatoDiseaseDetection</string>
+
+    <string name="upload_btn">UPLOAD</string>
+    <string name="save_offline_btn">SAVE OFFLINE</string>
+
+    <string name="check">Check</string>
+    <string name="resultInvalid">Invalid</string>
+
+    <string name="text_choose_eng" translatable="false">Choose your language</string>
+    <string name="text_choose_hindi">अपनी भाषा चुनिए</string>
+    <string name="no_image_found_in_storage">No images found</string>
+
+    <string name="btn_eng" translatable="false">ENGLISH</string>
+    <string name="btn_hin">हिंदी</string>
+    <string name="label_fragment_name">Label</string>
+    <string name="predict_fragment_name">Predict</string>
+    <string name="crop_name">Crop Name: </string>
+    <string name="area_timeout">Area: Timeout</string>
+    <string name="area">Area</string>
+    <string name="health_status_text">Health Description: </string>
+    <string name="no_image_sel_toast">No image selected</string>
+    <string name="uploaded_toast">Uploaded</string>
+    <string name="all_fields_toast">All fields required.</string>
+    <string name="error_toast">Error: </string>
+    <string name="invalid">Invalid</string>
+    <string name="could_not_save_toast">Could not be saved in device</string>
+    <string name="enter_crop_name">Enter crop name</string>
+    <string name="enter_label">Enter label</string>
+
+    <string name="manual">MANUAL</string>
+    <string name="saved_device_toast">Saved in your device.</string>
+    <string name="please_wait">Please wait..</string>
+</resources>

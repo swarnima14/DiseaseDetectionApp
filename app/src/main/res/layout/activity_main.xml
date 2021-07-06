@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:forceDarkAllowed="false">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        style="@style/Widget.AppCompat.PopupMenu">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:theme="@style/Widget.AppCompat.PopupMenu"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.01"
+        app:layout_constraintTop_toBottomOf="@id/appBar"/>
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ibUpload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.Button"
+        android:text="@string/upload_btn"
+        android:textColor="@color/white"
+        android:textStyle="normal"
+        android:textSize="18sp"
+        android:drawableLeft="@drawable/upload"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ibSave"
+        android:layout_marginTop="5dp"/>
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ibSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.Button"
+        android:text="@string/save_offline_btn"
+        android:textColor="@color/white"
+        android:textStyle="normal"
+        android:textSize="18sp"
+        android:drawableLeft="@drawable/down"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvResult"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="10dp"/>
+
+
+    <ImageView
+        android:id="@+id/ivImg"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layBtn"
+        android:src="@drawable/no_image"
+        android:scaleType="fitXY"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:padding="3dp" />
+
+    <TextView
+        android:id="@+id/tvResult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivImg"
+        android:textSize="20sp"
+        android:text="@string/health_status_text"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:layout_margin="15dp"/>
+
+
+    <LinearLayout
+        android:id="@+id/layBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/appBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="5dp"
+        android:gravity="center">
+
+        <ImageButton
+            android:id="@+id/btnGallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/ripple_background"
+            android:contentDescription="open gallery"
+            android:padding="8dp"
+            android:src="@drawable/gallery" />
+        <ImageButton
+            android:id="@+id/btnCapture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:padding="8dp"
+            android:contentDescription="open camera"
+            android:src="@drawable/camera"
+            android:background="@drawable/ripple_background"/>
+
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintGuide_percent="1"
+        app:layout_constraintTop_toBottomOf="@id/ibUpload" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
