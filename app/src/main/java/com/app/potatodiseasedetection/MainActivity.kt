@@ -25,6 +25,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 
+
 import com.app.potatodiseasedetection.ml.Potatodiseasedetection
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ml.modeldownloader.CustomModel
@@ -65,6 +66,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
     lateinit var interpreter: Interpreter
     lateinit var currentLang: String
     lateinit var fileName:String
+    lateinit var output: ByteBuffer
 
     var uri: Uri? = null
     val FILE_NAME = "pic"
@@ -402,7 +404,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
             var resized: Bitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true)
 
-            val output = convertBitmapToByteBuffer(resized)
+             output = convertBitmapToByteBuffer(resized)
 
 
             val model = Potatodiseasedetection.newInstance(this@MainActivity)
@@ -417,7 +419,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             val outputFeature0 = outputs.outputFeature0AsTensorBuffer
 
             max = getMax(outputFeature0.floatArray)
-
+           // ivImg.setImageBitmap(getOutputImage())
 
             if (max == -1) {
                 tvResult.text = getString(R.string.health_status_text) + " ${getString(R.string.invalid)}"
@@ -443,10 +445,6 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         for (i in 0 until 300) {
             for (j in 0 until 300) {
                 val pixelVal = pixels[pixel++]
-                // Do note that the method to add pixels to byteBuffer is different for quantized models over normal tflite models
-                /* byteBuffer.put((pixelVal shr 16 and 0xFF).toByte())
-                 byteBuffer.put((pixelVal shr 8 and 0xFF).toByte())
-                 byteBuffer.put((pixelVal and 0xFF).toByte())*/
 
                 byteBuffer.putFloat((pixelVal shr 16 and 0xFF) / 255f)
                 byteBuffer.putFloat((pixelVal shr 8 and 0xFF) / 255f)
@@ -459,14 +457,33 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         return byteBuffer
     }
 
+    private fun getOutputImage(): Bitmap {
+        output?.rewind() // Rewind the output buffer after running.
+
+        val bitmap = Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888)
+        val pixels = IntArray(300 * 300) // Set your expected output's height and width
+        for (i in 0 until 300 * 300) {
+            val a = 0xFF
+            val r: Float = output?.float!! * 255.0f
+            val g: Float = output?.float!! * 255.0f
+            val b: Float = output?.float!! * 255.0f
+            pixels[i] = a shl 24 or (r.toInt() shl 16) or (g.toInt() shl 8) or b.toInt()
+        }
+
+        bitmap.setPixels(pixels, 0, 300, 0, 0, 300, 300)
+
+        return bitmap
+    }
+
     fun getMax(arr: FloatArray): Int{
 
         var ind = -1
         var min = 0.0f
 
         for (i in 0..1) {
+            Toast.makeText(this, "val: ${arr[i]}", Toast.LENGTH_SHORT).show()
 
-            if (arr[i] > min && arr[i] > 0.99999) { // can be changed
+            if (arr[i] > min) { // can be changed
 
                 ind = i
                 min = arr[i]
