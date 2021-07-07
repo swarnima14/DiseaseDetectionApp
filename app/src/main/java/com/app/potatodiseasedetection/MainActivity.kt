@@ -1,5 +1,6 @@
 package com.app.potatodiseasedetection
 
+
 import android.Manifest
 import android.app.Activity
 import android.app.Dialog
@@ -8,15 +9,13 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.media.ExifInterface
 import android.net.Uri
+import android.opengl.ETC1
 import android.os.*
 import android.provider.MediaStore
-import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -24,14 +23,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-
-
 import com.app.potatodiseasedetection.ml.Potatodiseasedetection
+import com.app.potatodiseasedetection.ml.Resnet50ForPotatoLeafRgbNew
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.ml.modeldownloader.CustomModel
-import com.google.firebase.ml.modeldownloader.CustomModelDownloadConditions
-import com.google.firebase.ml.modeldownloader.DownloadType
-import com.google.firebase.ml.modeldownloader.FirebaseModelDownloader
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_custom.*
@@ -41,6 +35,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import pyxis.uzuki.live.mediaresizer.MediaResizer
 import pyxis.uzuki.live.mediaresizer.data.ImageResizeOption
@@ -49,7 +44,6 @@ import pyxis.uzuki.live.mediaresizer.model.ImageMode
 import pyxis.uzuki.live.mediaresizer.model.MediaType
 import pyxis.uzuki.live.mediaresizer.model.ScanRequest
 import java.io.*
-import java.lang.Exception
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.text.SimpleDateFormat
@@ -127,14 +121,11 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             btnCam = true
             btnGal = false
 
-            if(isPermissionGranted())
+            if (isPermissionGranted())
                 openCamera()
-            else{
+            else {
                 takePermission()
             }
-
-
-
 
 
         })
@@ -225,7 +216,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         }
         else{*/
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), 2)
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), 2)
         
     }
 
@@ -235,7 +226,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         else{*/
             val readExternalStoragePermission = ContextCompat.checkSelfPermission(this,
                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE).toString())
+                            Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE).toString())
             return readExternalStoragePermission == PackageManager.PERMISSION_GRANTED
 
     }
@@ -276,7 +267,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         editor.apply()
         editor.commit()
 
-        fileProvider = FileProvider.getUriForFile(this,"com.app.potatodiseasedetection.fileprovider", photoFile!!)
+        fileProvider = FileProvider.getUriForFile(this, "com.app.potatodiseasedetection.fileprovider", photoFile!!)
         camIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
 
         pfile = photoFile
@@ -287,7 +278,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
     private fun getPhotoFile(fileName: String): File {
         val storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(fileName,".jpg", storageDirectory)
+        return File.createTempFile(fileName, ".jpg", storageDirectory)
     }
 
      override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -350,7 +341,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
              try {
 
                  //predictAsync(this, bitmap, tvResult).execute()
-             }catch(e: Exception){
+             }catch (e: Exception){
                  Toast.makeText(this, "${getString(R.string.error_toast)} ${e.message}", Toast.LENGTH_LONG).show()
              }
          }
@@ -364,9 +355,10 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
 
              photoFile = File(uri.toString())
+             predictName()
 
              CoroutineScope(Dispatchers.Main).launch {
-                 predictName()
+                // predictName()
                  //predictAsync(this@MainActivity, bitmap, tvResult).execute()
                  //downloadCustomModel()
 
@@ -376,7 +368,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
              try {
 
                  //predictAsync(this, bitmap, tvResult).execute()
-             }catch(e: Exception){
+             }catch (e: Exception){
                  Toast.makeText(this, "${getString(R.string.error_toast)} ${e.message}", Toast.LENGTH_LONG).show()
              }
 
@@ -384,10 +376,10 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
     }
 
-    private suspend fun predictName(){
+    private  fun predictName(){
 
 
-        withContext(Dispatchers.Main) {
+      //  withContext(Dispatchers.Main) {
             val a = FileUtil.getPath(uri!!, applicationContext)
 
             bitmap = BitmapFactory.decodeFile(File(a.toString()).absolutePath)
@@ -396,21 +388,20 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             }
 
             else {
-                "class.txt"
+                "plant_labels.txt"
             }
             var max = 0
             val inpString = application.assets.open(fileName).bufferedReader().use { it.readText() }
             val cropList = inpString.split("\n")
 
-            var resized: Bitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true)
+            var resized: Bitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true)
 
              output = convertBitmapToByteBuffer(resized)
 
-
-            val model = Potatodiseasedetection.newInstance(this@MainActivity)
+            val model = Resnet50ForPotatoLeafRgbNew.newInstance(this@MainActivity)
 
             // Creates inputs for reference.
-            val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 300, 300, 3), DataType.FLOAT32)
+            val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 224, 224, 3), DataType.FLOAT32)
 
             inputFeature0.loadBuffer(output!!)
 
@@ -418,8 +409,16 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             val outputs = model.process(inputFeature0)
             val outputFeature0 = outputs.outputFeature0AsTensorBuffer
 
+
+
+/*val tbuffer = TensorImage.fromBitmap(resized)
+            var byteBuffer = tbuffer.buffer
+            inputFeature0.loadBuffer(byteBuffer)
+            val outputs = model.process(inputFeature0)
+            var outputFeature0 = outputs.outputFeature0AsTensorBuffer*/
+
             max = getMax(outputFeature0.floatArray)
-           // ivImg.setImageBitmap(getOutputImage())
+
 
             if (max == -1) {
                 tvResult.text = getString(R.string.health_status_text) + " ${getString(R.string.invalid)}"
@@ -428,23 +427,29 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
                 name = cropList[max]
                 tvResult.text = getString(R.string.health_status_text) + " ${cropList[max]}"
             }
+           // ivImg.setImageBitmap(getOutputImage())
             model.close()
-        }
+
 
     }
 
     private fun convertBitmapToByteBuffer(bmp: Bitmap): ByteBuffer {
         // Specify the size of the byteBuffer
-        val byteBuffer = ByteBuffer.allocateDirect(1 * 300 * 300 * 3 * 4)
+        val byteBuffer = ByteBuffer.allocateDirect(1 * 224 * 224 * 3 * 4)
         byteBuffer.order(ByteOrder.nativeOrder())
         // Calculate the number of pixels in the image
-        val pixels = IntArray(300 * 300)
+        val pixels = IntArray(224 * 224)
         bmp.getPixels(pixels, 0, bmp.width, 0, 0, bmp.width, bmp.height)
         var pixel = 0
         // Loop through all the pixels and save them into the buffer
-        for (i in 0 until 300) {
-            for (j in 0 until 300) {
+        for (i in 0 until 224) {
+            for (j in 0 until 224) {
                 val pixelVal = pixels[pixel++]
+
+                // Do note that the method to add pixels to byteBuffer is different for quantized models over normal tflite models
+                /* byteBuffer.put((pixelVal shr 16 and 0xFF).toByte())
+                 byteBuffer.put((pixelVal shr 8 and 0xFF).toByte())
+                 byteBuffer.put((pixelVal and 0xFF).toByte())*/
 
                 byteBuffer.putFloat((pixelVal shr 16 and 0xFF) / 255f)
                 byteBuffer.putFloat((pixelVal shr 8 and 0xFF) / 255f)
@@ -455,7 +460,26 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         // Recycle the bitmap to save memory
         bmp.recycle()
         return byteBuffer
+
+
+
+
     }
+
+   /* @JvmName("setBitmap1")
+    fun setBitmap(bmp: Bitmap): Array<ByteBuffer> {
+
+        val imageSize = bmp.rowBytes * bmp.height
+        val uncompressedBuffer = ByteBuffer.allocateDirect(imageSize)
+        bmp.copyPixelsToBuffer(uncompressedBuffer)
+        uncompressedBuffer.position(0)
+        val compressedBuffer = ByteBuffer.allocateDirect(
+                ETC1.getEncodedDataSize(bmp.width, bmp.height)).order(ByteOrder.nativeOrder())
+        ETC1.encodeImage(uncompressedBuffer, bmp.width, bmp.height, 2, 2 * bmp.width,
+                compressedBuffer)
+        var mByteBuffers = arrayOf(compressedBuffer)
+        return mByteBuffers
+    }*/
 
     private fun getOutputImage(): Bitmap {
         output?.rewind() // Rewind the output buffer after running.
@@ -491,6 +515,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             }
 
         }
+
         return ind
     }
 
@@ -584,7 +609,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun saveImageInDevice(ph:File) {
+    private fun saveImageInDevice(ph: File) {
 
 
 
@@ -607,10 +632,10 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             ph.delete()
 
 
-            Toast.makeText(this,getString(R.string.saved_device_toast),Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.saved_device_toast), Toast.LENGTH_SHORT).show()
         } catch (e: IOException) {
             e.printStackTrace()
-            Toast.makeText(this,"${applicationContext.getString(R.string.could_not_save_toast)} "+e.message,Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "${applicationContext.getString(R.string.could_not_save_toast)} " + e.message, Toast.LENGTH_SHORT).show()
 
         }
 
