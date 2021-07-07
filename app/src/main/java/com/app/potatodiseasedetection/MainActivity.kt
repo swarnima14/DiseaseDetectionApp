@@ -507,7 +507,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         for (i in 0..1) {
             Toast.makeText(this, "val: ${arr[i]}", Toast.LENGTH_SHORT).show()
 
-            if (arr[i] > min) { // can be changed
+            if (arr[i] > min && arr[i]>0.9) { // can be changed
 
                 ind = i
                 min = arr[i]
