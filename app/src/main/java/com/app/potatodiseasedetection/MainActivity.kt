@@ -79,11 +79,19 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
     var pressGal = false
     var pressCam = false
 
+    var btnGal = false
+    var btnCam = false
+
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        /*if(isPermissionGranted())
+            Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
+        else
+            takePermission()*/
 
         setSupportActionBar(toolbar)
         toolbar.title = "Potato Disease Detection"
@@ -100,22 +108,32 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         list.add("स्वस्थ")
 
         btnGallery.setOnClickListener {
+            btnGal = true
+            btnCam = false
 
-            takeWritePermission()
+                if(isPermissionGranted())
+                takeWritePermission()
+            else{
+                takePermission()
+                }
+
 
 
         }
 
         btnCapture.setOnClickListener(View.OnClickListener {
+            btnCam = true
+            btnGal = false
 
-
-            if(isPermissionGranted()){
-                //Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show()
+            if(isPermissionGranted())
                 openCamera()
+            else{
+                takePermission()
             }
 
-            else
-                takePermission()
+
+
+
 
         })
 
@@ -161,7 +179,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
     }
 
     private fun takeWritePermission() {
-        if (ContextCompat.checkSelfPermission(this,
+        /*if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
             != PackageManager.PERMISSION_GRANTED) {
 
@@ -176,7 +194,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             // sees the explanation, try again to request the permission.
         }
 
-        else {
+        else {*/
             // Permission has already been granted
 
             pressGal = false
@@ -187,11 +205,11 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             intent.type = "image/*"
 
             startActivityForResult(intent, 97)
-        }
+
     }
 
     private fun takePermission() {
-        if(Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
+        /*if(Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
             try {
                 val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
                 intent.addCategory("android.intent.category.DEFAULT")
@@ -203,21 +221,21 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
                 startActivityForResult(intent, 1)
             }
         }
-        else{
+        else{*/
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), 2)
-        }
+        
     }
 
     private fun isPermissionGranted(): Boolean {
-        if(Build.VERSION.SDK_INT == Build.VERSION_CODES.R)
+        /*if(Build.VERSION.SDK_INT == Build.VERSION_CODES.R)
             return Environment.isExternalStorageManager()
-        else{
+        else{*/
             val readExternalStoragePermission = ContextCompat.checkSelfPermission(this,
                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE).toString())
             return readExternalStoragePermission == PackageManager.PERMISSION_GRANTED
-        }
+
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -227,8 +245,11 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         if(grantResults.size > 0 && requestCode ==2){
             val readExtStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED
             if(readExtStorage){
-                //Toast.makeText(this, "perm granted now", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "perm granted now", Toast.LENGTH_SHORT).show()
+                if(btnCam)
                 openCamera()
+                if(btnGal)
+                    takeWritePermission()
             }
             else{
                 takePermission()
@@ -274,8 +295,8 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
              if(requestCode == 1){
                  if(Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
                      if(Environment.isExternalStorageManager()){
-                        // Toast.makeText(this, "perm granted", Toast.LENGTH_SHORT).show()
-                         openCamera()
+                         Toast.makeText(this, "perm granted", Toast.LENGTH_SHORT).show()
+                        // openCamera()
                      }
                  }
              }
@@ -699,5 +720,14 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         }
         return true
     }
+
+    /*override fun onStart() {
+        super.onStart()
+        if(isPermissionGranted())
+            Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
+        else{
+            takePermission()
+        }
+    }*/
 
 }
