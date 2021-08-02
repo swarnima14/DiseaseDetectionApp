@@ -2,7 +2,7 @@
     <string name="app_name">PotatoDiseaseDetection</string>
 
     <string name="upload_btn">UPLOAD</string>
-    <string name="save_offline_btn">SAVE OFFLINE</string>
+    <string name="save_offline_btn">SAVE</string>
 
     <string name="check">Check</string>
     <string name="resultInvalid">Invalid</string>
@@ -18,7 +18,7 @@
     <string name="crop_name">Crop Name: </string>
     <string name="area_timeout">Area: Timeout</string>
     <string name="area">Area</string>
-    <string name="health_status_text">Health Description: </string>
+    <string name="health_status_text">Health Status: </string>
     <string name="no_image_sel_toast">No image selected</string>
     <string name="uploaded_toast">Uploaded</string>
     <string name="all_fields_toast">All fields required.</string>
@@ -31,4 +31,6 @@
     <string name="manual">MANUAL</string>
     <string name="saved_device_toast">Saved in your device.</string>
     <string name="please_wait">Please wait..</string>
+    <string name="txtcamera">CAMERA</string>
+    <string name="txtgallery">GALLERY</string>
 </resources>

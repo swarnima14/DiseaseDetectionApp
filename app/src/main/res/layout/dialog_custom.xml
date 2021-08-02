@@ -1,9 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lang2Anim"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="language.json"
+        app:layout_constraintDimensionRatio="16:9"
+        app:lottie_loop="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/customTextEng"
@@ -13,7 +29,10 @@
         android:text="@string/text_choose_eng"
         android:textStyle="bold"
         android:textSize="20sp"
-        android:padding="10sp"/>
+        android:padding="3sp"
+        app:layout_constraintTop_toBottomOf="@id/lang2Anim"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/customTextHindi"
@@ -24,15 +43,21 @@
         android:textStyle="bold"
         android:textSize="20sp"
         android:layout_marginTop="5dp"
-        android:padding="10sp"/>
+        android:padding="3sp"
+        app:layout_constraintTop_toBottomOf="@id/customTextEng"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_horizontal"
-        android:layout_marginTop="20dp"
-        android:padding="10sp">
+        android:layout_marginTop="5dp"
+        android:padding="10sp"
+        app:layout_constraintTop_toBottomOf="@id/customTextHindi"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/customBtnEng"
@@ -41,7 +66,7 @@
             android:text="@string/btn_eng"
             android:textSize="16sp"
             android:layout_marginEnd="15dp"
-            android:padding="10sp"/>
+            android:padding="3sp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/customBtnHin"
@@ -50,8 +75,8 @@
             android:text="@string/btn_hin"
             android:textSize="16sp"
             android:layout_marginStart="15dp"
-            android:padding="10sp"/>
+            android:padding="3sp"/>
 
     </LinearLayout>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

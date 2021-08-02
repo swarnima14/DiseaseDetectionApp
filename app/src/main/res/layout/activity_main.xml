@@ -1,11 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
+    android:background="#fff"
     android:forceDarkAllowed="false">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
@@ -14,15 +21,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:background="#141414"
+
         style="@style/Widget.AppCompat.PopupMenu">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="0.3"
+                android:layout_height="wrap_content"
+                android:src="@drawable/logo"
+                android:padding="1sp"
+                android:background="#141414"/>
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:theme="@style/Widget.AppCompat.PopupMenu"/>
+            android:layout_width="0dp"
+            android:layout_weight="0.7"
+            android:layout_height="match_parent"/>
+
+        </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
+
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline1"
@@ -30,101 +55,252 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.01"
-        app:layout_constraintTop_toBottomOf="@id/appBar"/>
+        app:layout_constraintTop_toBottomOf="@id/appBar"
+        tools:ignore="NotSibling" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvResult"
+        android:layout_marginTop="5dp"
+        android:gravity="center_horizontal"
+        android:weightSum="2">
 
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/ibUpload"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.Button"
+        app:backgroundTint="#10753b"
         android:text="@string/upload_btn"
         android:textColor="@color/white"
         android:textStyle="normal"
         android:textSize="18sp"
+        app:cornerRadius="20dp"
+        app:elevation="10dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="5dp"
         android:drawableLeft="@drawable/upload"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ibSave"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ibSave"
+        app:layout_constraintTop_toBottomOf="@id/tvResult"
         android:layout_marginTop="5dp"/>
 
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/ibSave"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
-        style="@style/Widget.MaterialComponents.Button"
+        android:backgroundTint="#10753b"
         android:text="@string/save_offline_btn"
         android:textColor="@color/white"
         android:textStyle="normal"
         android:textSize="18sp"
-        android:drawableLeft="@drawable/down"
+        app:cornerRadius="20dp"
+        android:elevation="10dp"
+        android:layout_marginStart="5dp"
+        android:drawableLeft="@drawable/save"
+        app:layout_constraintEnd_toStartOf="@id/ibUpload"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvResult"
         android:layout_marginTop="5dp"
-        android:layout_marginEnd="10dp"/>
+        android:layout_marginEnd="15dp"/>
+
+    </LinearLayout>
 
 
     <ImageView
         android:id="@+id/ivImg"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="350dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layBtn"
-        android:src="@drawable/no_image"
+        app:layout_constraintTop_toBottomOf="@id/lay1"
+        android:src="@drawable/noimage2"
+
         android:scaleType="fitXY"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:padding="3dp" />
+
+
+    <LinearLayout
+        android:id="@+id/layAnim"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivImg"
+        android:layout_marginTop="5dp"
+        android:visibility="gone">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/potato"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+
+        app:civ_border_color="@color/black"
+        android:src="@drawable/potatohappy"
+        app:civ_border_width="1dp"
+            app:elevation="10dp"
+            android:padding="3sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--<com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/rightAnim"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="right.json"
+        app:lottie_loop="true"
+        android:alpha="1" />-->
+
+
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvResult"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ivImg"
-        android:textSize="20sp"
-        android:text="@string/health_status_text"
+        android:layout_margin="15dp"
+        android:fontFamily="@font/aldrich"
+        android:textAllCaps="true"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:layout_margin="15dp"/>
-
-
-    <LinearLayout
-        android:id="@+id/layBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/appBar"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="5dp"
-        android:gravity="center">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layAnim" />
 
-        <ImageButton
+
+        <LinearLayout
+            android:id="@+id/lay1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/appBar"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center_horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8sp"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layBtnGal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp">
+
+        <ImageView
             android:id="@+id/btnGallery"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:background="@drawable/ripple_background"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/btn_bg"
             android:contentDescription="open gallery"
-            android:padding="8dp"
-            android:src="@drawable/gallery" />
-        <ImageButton
-            android:id="@+id/btnCapture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:padding="8dp"
-            android:contentDescription="open camera"
-            android:src="@drawable/camera"
-            android:background="@drawable/ripple_background"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-    </LinearLayout>
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/galAnim"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:alpha="1"
+            app:layout_constraintBottom_toBottomOf="@id/btnGallery"
+            app:layout_constraintEnd_toEndOf="@id/btnGallery"
+            app:layout_constraintStart_toStartOf="@id/btnGallery"
+            app:layout_constraintTop_toTopOf="@id/btnGallery"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="gal2.json"
+            app:lottie_loop="true" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/tvGal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txtgallery"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/aldrich"
+                    android:textColor="#10753b"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8sp"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal">
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layBtnCam"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp">
+
+                    <ImageView
+                        android:id="@+id/btnCapture"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="4dp"
+                        android:contentDescription="open camera"
+                        android:background="@drawable/btn_bg"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/capAnim"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        app:layout_constraintEnd_toEndOf="@id/btnCapture"
+                        app:layout_constraintStart_toStartOf="@id/btnCapture"
+                        app:layout_constraintTop_toTopOf="@id/btnCapture"
+                        app:layout_constraintBottom_toBottomOf="@id/btnCapture"
+                        app:lottie_autoPlay="true"
+                        app:lottie_fileName="cam1.json"
+                        app:lottie_loop="true"
+                        android:alpha="1"/>
+
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/tvCam"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txtcamera"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/aldrich"
+                    android:textColor="#10753b" />
+            </LinearLayout>
+
+        </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -133,7 +309,9 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="parent"
         app:layout_constraintGuide_percent="1"
-        app:layout_constraintTop_toBottomOf="@id/ibUpload" />
+        />
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

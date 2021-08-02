@@ -2,6 +2,7 @@ package com.app.potatodiseasedetection
 
 
 import android.Manifest
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
@@ -9,13 +10,14 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
-import android.opengl.ETC1
 import android.os.*
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -23,16 +25,15 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.app.potatodiseasedetection.ml.Potatodiseasedetection
-import com.app.potatodiseasedetection.ml.Resnet50ForPotatoLeafRgbNew
+import com.app.potatodiseasedetection.ml.Model
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
+import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_custom.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.support.image.TensorImage
@@ -45,7 +46,6 @@ import pyxis.uzuki.live.mediaresizer.model.MediaType
 import pyxis.uzuki.live.mediaresizer.model.ScanRequest
 import java.io.*
 import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -84,13 +84,11 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        /*if(isPermissionGranted())
-            Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
-        else
-            takePermission()*/
-
         setSupportActionBar(toolbar)
-        toolbar.title = "Potato Disease Detection"
+
+        toolbar.setBackgroundColor(Color.parseColor("#141414"))
+        toolbar.title=null
+        toolbar.setTitleTextColor(Color.parseColor("#141414"))
 
         val prefs = getSharedPreferences("MY_LANGUAGE", MODE_PRIVATE)
         currentLang = prefs.getString("myLanguage", "eng").toString()
@@ -103,9 +101,13 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         list.add("रोगी")
         list.add("स्वस्थ")
 
+
+
         btnGallery.setOnClickListener {
             btnGal = true
             btnCam = false
+
+            layAnim.visibility = View.GONE
 
                 if(isPermissionGranted())
                 takeWritePermission()
@@ -120,6 +122,8 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         btnCapture.setOnClickListener(View.OnClickListener {
             btnCam = true
             btnGal = false
+
+            layAnim.visibility = View.GONE
 
             if (isPermissionGranted())
                 openCamera()
@@ -150,8 +154,10 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
                 val prefs = getSharedPreferences("MY_FILE", AppCompatActivity.MODE_PRIVATE)
                 val fi = prefs.getString("myFile", "").toString()
                 photoFile = File(fi)
-                if(name == "Invalid")
+                if(name == "Invalid") {
                     Toast.makeText(this, getString(R.string.invalid), Toast.LENGTH_SHORT).show()
+
+                }
 
                 else if(photoFile != null && name != null && name != getString(R.string.invalid))
                     saveImageInDevice(photoFile)
@@ -162,14 +168,20 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
 
 
-            ivImg.setImageResource(R.drawable.no_image)
-            tvResult.text = getString(R.string.health_status_text)
+            ivImg.setImageResource(R.drawable.noimage2)
+            tvResult.text = ""
         }
 
         ibUpload.setOnClickListener {
+            layAnim.visibility = View.GONE
             uploadAsync(this, date, list).execute()
+            tvResult.text = ""
+            ivImg.setImageResource(R.drawable.noimage2)
+
         }
     }
+
+
 
     private fun takeWritePermission() {
         /*if (ContextCompat.checkSelfPermission(this,
@@ -191,8 +203,9 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             // Permission has already been granted
 
             pressGal = false
-            ivImg.setImageResource(R.drawable.no_image)
-            tvResult.text = getString(R.string.health_status_text)
+            ivImg.setImageResource(R.drawable.noimage2)
+       // noimgAnim.setAnimation("noimage.json")
+        tvResult.text = ""
 
             var intent: Intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.type = "image/*"
@@ -238,7 +251,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         if(grantResults.size > 0 && requestCode ==2){
             val readExtStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED
             if(readExtStorage){
-                Toast.makeText(this, "perm granted now", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(this, "Permissions granted now.", Toast.LENGTH_SHORT).show()
                 if(btnCam)
                 openCamera()
                 if(btnGal)
@@ -255,8 +268,8 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
     {
         pressCam = false
 
-        ivImg.setImageResource(R.drawable.no_image)
-        tvResult.text = getString(R.string.health_status_text)
+        ivImg.setImageResource(R.drawable.noimage2)
+tvResult.text = ""
 
         var camIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
@@ -288,7 +301,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
              if(requestCode == 1){
                  if(Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
                      if(Environment.isExternalStorageManager()){
-                         Toast.makeText(this, "perm granted", Toast.LENGTH_SHORT).show()
+                         Toast.makeText(this, "Permissions Granted.", Toast.LENGTH_SHORT).show()
                         // openCamera()
                      }
                  }
@@ -328,7 +341,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
              uri = Uri.fromFile(photoFile)
              bitmap = BitmapFactory.decodeFile(photoFile.path)
 
-            // downloadCustomModel()
+
 
              CoroutineScope(Dispatchers.Main).launch {
                  predictName()
@@ -348,13 +361,36 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
          if(resultCode == RESULT_OK && requestCode == 97 && data!=null) {
 
+             var fadeAnim = AnimationUtils.loadAnimation(this, R.anim.fade)
              pressGal = true
+
 
              ivImg.setImageURI(data!!.data)
              uri = data!!.data
 
 
-             photoFile = File(uri.toString())
+            // photoFile = File(uri.toString())
+             val s = FileUtil.getPath(uri!!, this)
+             photoFile = File(s)
+
+             /*val resizeOption = ImageResizeOption.Builder()
+                     .setImageProcessMode(ImageMode.ResizeAndCompress)
+                     .setImageResolution(1280, 720)
+                     .setBitmapFilter(false)
+                     .setCompressFormat(Bitmap.CompressFormat.JPEG)
+                     .setCompressQuality(75)
+                     .setScanRequest(ScanRequest.TRUE)
+                     .build()
+
+             val option = ResizeOption.Builder()
+                     .setMediaType(MediaType.IMAGE)
+                     .setImageResizeOption(resizeOption)
+                     .setTargetPath(photoFile.absolutePath)
+                     .setOutputPath(photoFile.absolutePath)
+                     .build()
+
+             MediaResizer.process(option)*/
+
              predictName()
 
              CoroutineScope(Dispatchers.Main).launch {
@@ -394,16 +430,20 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             val inpString = application.assets.open(fileName).bufferedReader().use { it.readText() }
             val cropList = inpString.split("\n")
 
-            var resized: Bitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true)
+            var resized: Bitmap = Bitmap.createScaledBitmap(bitmap, 190, 190, true)
 
-             output = convertBitmapToByteBuffer(resized)
+             // output = convertBitmapToByteBuffer(resized)
 
-            val model = Resnet50ForPotatoLeafRgbNew.newInstance(this@MainActivity)
+            val model = Model.newInstance(this@MainActivity)
 
             // Creates inputs for reference.
-            val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 224, 224, 3), DataType.FLOAT32)
+            val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 190, 190, 3), DataType.FLOAT32)
 
-            inputFeature0.loadBuffer(output!!)
+           // inputFeature0.loadBuffer(output!!)
+        val tensorImage = TensorImage(DataType.FLOAT32)
+        tensorImage.load(resized)
+        var byteBuffer = tensorImage.buffer
+        inputFeature0.loadBuffer(byteBuffer)
 
             // Runs model inference and gets result.
             val outputs = model.process(inputFeature0)
@@ -420,94 +460,63 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             max = getMax(outputFeature0.floatArray)
 
 
-            if (max == -1) {
-                tvResult.text = getString(R.string.health_status_text) + " ${getString(R.string.invalid)}"
+            if (max == -1 || max == 2) {
+                tvResult.setTextColor(Color.BLACK)
+                tvResult.text = " ${getString(R.string.invalid)}"
                 name = "Invalid"
+
+
+
+
+
             } else {
                 name = cropList[max]
-                tvResult.text = getString(R.string.health_status_text) + " ${cropList[max]}"
+                if(max==0){
+
+                    var lottieAnimationFile = "wrong2.json"
+                    layAnim.visibility = View.VISIBLE
+                    potato.setImageResource(R.drawable.potatosad)
+                  //  shakeAnim(potato)
+                  //  potato.animation = AnimationUtils.loadAnimation(this, R.anim.scale_up)
+
+                    potato.animation = AnimationUtils.loadAnimation(this, R.anim.shake)
+                    //setStepContent(lottieAnimationFile)
+                    tvResult.setTextColor(Color.RED)
+                }
+                if(max==1){
+
+                    var lottieAnimationFile = "right2.json"
+                    layAnim.visibility = View.VISIBLE
+                    potato.setImageResource(R.drawable.potatohappy)
+                    potato.animation = AnimationUtils.loadAnimation(this, R.anim.scale_up)
+                    //setStepContent(lottieAnimationFile)
+                    tvResult.setTextColor(Color.GREEN)
+                }
+                tvResult.text = "${cropList[max]}"
             }
-           // ivImg.setImageBitmap(getOutputImage())
+          //  ivImg.setImageBitmap(getOutputImage())
             model.close()
 
 
     }
 
-    private fun convertBitmapToByteBuffer(bmp: Bitmap): ByteBuffer {
-        // Specify the size of the byteBuffer
-        val byteBuffer = ByteBuffer.allocateDirect(1 * 224 * 224 * 3 * 4)
-        byteBuffer.order(ByteOrder.nativeOrder())
-        // Calculate the number of pixels in the image
-        val pixels = IntArray(224 * 224)
-        bmp.getPixels(pixels, 0, bmp.width, 0, 0, bmp.width, bmp.height)
-        var pixel = 0
-        // Loop through all the pixels and save them into the buffer
-        for (i in 0 until 224) {
-            for (j in 0 until 224) {
-                val pixelVal = pixels[pixel++]
+    /*private fun shakeAnim(potato: CircleImageView?) {
+        ObjectAnimator
+                .ofFloat(potato, "translationX", 0, 25, -25, 25, -25,15, -15, 6, -6, 0)
+                .setDuration(2500)
+                .start();
 
-                // Do note that the method to add pixels to byteBuffer is different for quantized models over normal tflite models
-                /* byteBuffer.put((pixelVal shr 16 and 0xFF).toByte())
-                 byteBuffer.put((pixelVal shr 8 and 0xFF).toByte())
-                 byteBuffer.put((pixelVal and 0xFF).toByte())*/
-
-                byteBuffer.putFloat((pixelVal shr 16 and 0xFF) / 255f)
-                byteBuffer.putFloat((pixelVal shr 8 and 0xFF) / 255f)
-                byteBuffer.putFloat((pixelVal and 0xFF) / 255f)
-            }
-        }
-
-        // Recycle the bitmap to save memory
-        bmp.recycle()
-        return byteBuffer
-
-
-
-
-    }
-
-   /* @JvmName("setBitmap1")
-    fun setBitmap(bmp: Bitmap): Array<ByteBuffer> {
-
-        val imageSize = bmp.rowBytes * bmp.height
-        val uncompressedBuffer = ByteBuffer.allocateDirect(imageSize)
-        bmp.copyPixelsToBuffer(uncompressedBuffer)
-        uncompressedBuffer.position(0)
-        val compressedBuffer = ByteBuffer.allocateDirect(
-                ETC1.getEncodedDataSize(bmp.width, bmp.height)).order(ByteOrder.nativeOrder())
-        ETC1.encodeImage(uncompressedBuffer, bmp.width, bmp.height, 2, 2 * bmp.width,
-                compressedBuffer)
-        var mByteBuffers = arrayOf(compressedBuffer)
-        return mByteBuffers
     }*/
-
-    private fun getOutputImage(): Bitmap {
-        output?.rewind() // Rewind the output buffer after running.
-
-        val bitmap = Bitmap.createBitmap(300, 300, Bitmap.Config.ARGB_8888)
-        val pixels = IntArray(300 * 300) // Set your expected output's height and width
-        for (i in 0 until 300 * 300) {
-            val a = 0xFF
-            val r: Float = output?.float!! * 255.0f
-            val g: Float = output?.float!! * 255.0f
-            val b: Float = output?.float!! * 255.0f
-            pixels[i] = a shl 24 or (r.toInt() shl 16) or (g.toInt() shl 8) or b.toInt()
-        }
-
-        bitmap.setPixels(pixels, 0, 300, 0, 0, 300, 300)
-
-        return bitmap
-    }
 
     fun getMax(arr: FloatArray): Int{
 
         var ind = -1
         var min = 0.0f
+       // Toast.makeText(this, "values: ${arr[0]} ${arr[1]} ${arr[2]}", Toast.LENGTH_LONG).show()
+        for (i in 0..2) {
 
-        for (i in 0..1) {
-            Toast.makeText(this, "val: ${arr[i]}", Toast.LENGTH_SHORT).show()
 
-            if (arr[i] > min && arr[i]>0.9) { // can be changed
+            if (arr[i] > min) { // can be changed
 
                 ind = i
                 min = arr[i]
@@ -521,7 +530,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        tvResult.text = ""
+
         ivImg.setImageBitmap(null)
     }
 
@@ -595,6 +604,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
                 Toast.makeText(context, context.getString(R.string.no_image_found_in_storage), Toast.LENGTH_SHORT).show()
 
             customProgressBar.dialog.dismiss()
+
         }
     }
 
@@ -633,6 +643,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
 
             Toast.makeText(this, getString(R.string.saved_device_toast), Toast.LENGTH_SHORT).show()
+            layAnim.visibility = View.GONE
         } catch (e: IOException) {
             e.printStackTrace()
             Toast.makeText(this, "${applicationContext.getString(R.string.could_not_save_toast)} " + e.message, Toast.LENGTH_SHORT).show()
@@ -651,6 +662,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
 
         if(item.itemId == R.id.menuReset){
             // Toast.makeText(context, "reset clicked", Toast.LENGTH_SHORT).show()

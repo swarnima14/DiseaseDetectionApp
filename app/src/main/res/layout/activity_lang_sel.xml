@@ -4,10 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:forceDarkAllowed="false">
 
-    android:orientation="vertical">
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <!--<de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imageView"
         android:layout_width="200dp"
         android:layout_height="200dp"
@@ -20,7 +21,26 @@ app:civ_border_color="@color/colorAccent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.227" />
+        app:layout_constraintVertical_bias="0.227" />-->
+
+
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/langAnim"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="100dp"
+        app:layout_constraintDimensionRatio="16:9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="world_lang.json"
+        app:lottie_loop="true"
+        android:alpha="1"/>
 
     <LinearLayout
         android:id="@+id/mainLay"
@@ -31,17 +51,19 @@ app:civ_border_color="@color/colorAccent"
         tools:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView">
+        app:layout_constraintTop_toBottomOf="@+id/langAnim">
 
 
-    <TextView
-        android:id="@+id/tvTextEng"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="@string/text_choose_eng"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        <TextView
+            android:id="@+id/tvTextEng"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="1"
+            android:fontFamily="@font/aldrich"
+            android:gravity="center_horizontal"
+            android:text="@string/text_choose_eng"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tvTextHindi"
@@ -72,7 +94,11 @@ app:civ_border_color="@color/colorAccent"
             android:layout_height="wrap_content"
             android:text="@string/btn_eng"
             android:textSize="16sp"
-            android:layout_marginEnd="15dp"/>
+            android:layout_marginEnd="15dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:strokeColor="@color/colorAccent"
+            app:cornerRadius="30dp"
+            app:strokeWidth="1.5dp"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnHin"
@@ -80,7 +106,11 @@ app:civ_border_color="@color/colorAccent"
             android:layout_height="wrap_content"
             android:text="@string/btn_hin"
             android:textSize="16sp"
-            android:layout_marginStart="15dp"/>
+            android:layout_marginStart="15dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:strokeColor="@color/colorAccent"
+            app:cornerRadius="30dp"
+            app:strokeWidth="1.5dp"/>
 
     </LinearLayout>
 

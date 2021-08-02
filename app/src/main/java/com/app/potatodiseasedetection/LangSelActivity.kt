@@ -1,9 +1,12 @@
 package com.app.potatodiseasedetection
 
+import android.animation.AnimatorInflater
+import android.animation.AnimatorSet
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_lang_sel.*
@@ -14,6 +17,12 @@ class LangSelActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_lang_sel)
+
+        var topAnim = AnimationUtils.loadAnimation(this, R.anim.top_animation)
+        langAnim.animation = topAnim
+
+        var bottomAnim = AnimationUtils.loadAnimation(this, R.anim.bottom_animation)
+        mainLay.animation = bottomAnim
 
             btnEng.setOnClickListener {
 

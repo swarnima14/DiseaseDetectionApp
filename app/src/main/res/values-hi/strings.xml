@@ -2,9 +2,8 @@
 <resources>
     <string name="app_name">PotatoDiseaseDetection</string>
 
-    <string name="upload_btn">ऑनलाइन अपलोड करें
-</string>
-    <string name="save_offline_btn">ऑफ़लाइन सहेजें</string>
+    <string name="upload_btn">अपलोड</string>
+    <string name="save_offline_btn">सहेजें</string>
     <string name="check">चेक</string>
     <string name="resultInvalid">अमान्य</string>
 
@@ -30,4 +29,7 @@
     <string name="manual">MANUAL</string>
     <string name="saved_device_toast">आपके डिवाइस में सहेजा गया</string>
     <string name="please_wait">कृपया प्रतीक्षा करें</string>
+
+    <string name="txtcamera">कैमरा</string>
+    <string name="txtgallery">गेलरी</string>
 </resources>
