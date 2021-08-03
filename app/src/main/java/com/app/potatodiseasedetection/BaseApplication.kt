@@ -15,6 +15,7 @@ class BaseApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        //initializes this application to use MediaResizer
         MediaResizerGlobal.initializeApplication(this)
     }
 }

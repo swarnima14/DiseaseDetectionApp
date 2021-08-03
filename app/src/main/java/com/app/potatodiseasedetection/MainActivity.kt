@@ -107,8 +107,9 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
             layAnim.visibility = View.GONE
 
+            //function to check for the permission before opening gallery
                 if(isPermissionGranted())
-                openGallery()
+                openGallery()//if function returns true gallery is opened
             else{
                 takePermission()
                 }
@@ -169,7 +170,8 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         }
 
         ibUpload.setOnClickListener {
-            layAnim.visibility = View.GONE
+            layAnim.visibility = View.GONE//potato animation removed
+            //to upload all the images at once async task is used
             uploadAsync(this, date, list).execute()
             tvResult.text = ""
             ivImg.setImageResource(R.drawable.noimage2)
@@ -181,10 +183,13 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
     private fun openGallery() {
 
-            pressGal = false
+            pressGal = false //set false at this point and make it true in onActivityResult so that if user doesn't click image this is not unnecessarily true
+
+        //if there is any image or text set it null
             ivImg.setImageResource(R.drawable.noimage2)
             tvResult.text = ""
 
+        //intent call to get content that is image, type is set image
             var intent: Intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.type = "image/*"
 
@@ -194,6 +199,8 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
     private fun takePermission() {
 
+        //if the permission is not granted a dialog occurs asking for the required permission
+        //its result is executed in onRequestPermissionResult function
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), 2)
         
@@ -201,27 +208,31 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
     private fun isPermissionGranted(): Boolean {
 
+        //checks for all the 3 permissions required
             val readExternalStoragePermission = ContextCompat.checkSelfPermission(this,
                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE).toString())
-            return readExternalStoragePermission == PackageManager.PERMISSION_GRANTED
+            return readExternalStoragePermission == PackageManager.PERMISSION_GRANTED //returns true if the permissions are already granted
 
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-
+        //checks if the grantsResults array is empty or not and the request code matches or not
         if(grantResults.size > 0 && requestCode ==2){
-            val readExtStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED
+            val readExtStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED // if the permission is granted it returns true else false
             if(readExtStorage){
 
+                //if statements, since permission is to be checked before opening gallery and camera therefore check which button was clicked and then open the required thing
+
                 if(btnCam)
-                openCamera()
+                    openCamera()
                 if(btnGal)
                     openGallery()
             }
             else{
+                //if users denies then again display the dialog to test permission
                 takePermission()
             }
         }
@@ -230,22 +241,26 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
     fun openCamera()
     {
-        pressCam = false
+        pressCam = false // this is set false so that if user doesn't click any image and returns it is not set true unnecessarily
 
         ivImg.setImageResource(R.drawable.noimage2)
         tvResult.text = ""
 
         var camIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
-        photoFile = getPhotoFile(FILE_NAME)
+        photoFile = getPhotoFile(FILE_NAME) // FILE_NAME is a string with value "pic" is passed into a function returns a temporary file with the name pic
+        //we are using filename to access the image so that the quality of image remains same
 
-        val editor = getSharedPreferences("MY_FILE", AppCompatActivity.MODE_PRIVATE).edit()
+        val editor = getSharedPreferences("MY_FILE", AppCompatActivity.MODE_PRIVATE).edit() //the file name is also saved in shared preferences
         editor.putString("myFile", photoFile.toString())
         editor.apply()
         editor.commit()
 
+
+        //file provider facilitates secure sharing of files associated with an app by creating content uri
+        //before doing this create fileprovider.xml in xml in res and see changes in manifest
         fileProvider = FileProvider.getUriForFile(this, "com.app.potatodiseasedetection.fileprovider", photoFile!!)
-        camIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
+        camIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider) //this means that the output of the camera intent i.e., the image is stored in the fileprovider
 
         //pfile = photoFile
 
@@ -273,15 +288,22 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
          if(requestCode == 99 && resultCode == Activity.RESULT_OK) {
 
-             pressCam = true
+             pressCam = true //since camera is giving the image therefore it is set true
+             // and will be used to see which file or uri is to be used further while storing image in device
 
+             //setlayout function so that when app returns to the activity the lang remains same
              setLayout(getSharedPreferences("MY_LANGUAGE", AppCompatActivity.MODE_PRIVATE).getString("myLanguage", "eng").toString())
 
+             //retrieves photofile from shared preferences
              val editor = getSharedPreferences("MY_FILE", AppCompatActivity.MODE_PRIVATE)
              photoFile = File(editor.getString("myFile", "").toString())
 
+             //set bitmap from path of file
              bitmap = BitmapFactory.decodeFile(photoFile.path)
              ivImg.setImageBitmap(bitmap)
+
+             //since the image size is quite large we use media resizer library to compress it without loosing its quality
+             //first create a class called BaseApplication and declare its name in application in manifest
 
              val resizeOption = ImageResizeOption.Builder()
                      .setImageProcessMode(ImageMode.ResizeAndCompress)
@@ -295,15 +317,17 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
              val option = ResizeOption.Builder()
                      .setMediaType(MediaType.IMAGE)
                      .setImageResizeOption(resizeOption)
-                     .setTargetPath(photoFile.absolutePath)
+                     .setTargetPath(photoFile.absolutePath) //the target location and the output path are same so that image gets replaced with with its compressed version
                      .setOutputPath(photoFile.absolutePath)
                      .build()
 
              MediaResizer.process(option)
 
+            //uri is extracted from file
              uri = Uri.fromFile(photoFile)
              bitmap = BitmapFactory.decodeFile(photoFile.path)
 
+             // call for predict func
              predictName()
 
          }
@@ -312,11 +336,12 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
              pressGal = true
 
-             ivImg.setImageURI(data!!.data)
+             ivImg.setImageURI(data!!.data) //this is the data returned from the intent, we don't use this in camera intent because image quality gets poor
              uri = data!!.data
 
-             val s = FileUtil.getPath(uri!!, this)
+             val s = FileUtil.getPath(uri!!, this) //to convert the uri of gallery image in file, output is a string
              photoFile = File(s)
+             //media resizer not used as image size of gallery images is not that large
 
              /*val resizeOption = ImageResizeOption.Builder()
                      .setImageProcessMode(ImageMode.ResizeAndCompress)
@@ -344,10 +369,10 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
     private  fun predictName(){
 
-            val a = FileUtil.getPath(uri!!, applicationContext)
+            val a = FileUtil.getPath(uri!!, applicationContext) //fetch the file name from given uri
 
-            bitmap = BitmapFactory.decodeFile(File(a.toString()).absolutePath)
-            fileName = if(currentLang == "hin"){
+            bitmap = BitmapFactory.decodeFile(File(a.toString()).absolutePath) //fetch bitmap from given file
+            fileName = if(currentLang == "hin"){ //if the app lang is hindi then file name for displaying output is different
                 "classHindi.txt"
             }
 
@@ -355,17 +380,18 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
                 "plant_labels.txt"
             }
             var max = 0
-            val inpString = application.assets.open(fileName).bufferedReader().use { it.readText() }
-            val cropList = inpString.split("\n")
+            val inpString = application.assets.open(fileName).bufferedReader().use { it.readText() } //opens the file fileName and read text and convert it into string
+            val cropList = inpString.split("\n") //split string at new line to get array of strings
 
-            var resized: Bitmap = Bitmap.createScaledBitmap(bitmap, 190, 190, true)
+            var resized: Bitmap = Bitmap.createScaledBitmap(bitmap, 190, 190, true) //resize bitmap according to the image specifications given in model
 
-            val model = Model.newInstance(this@MainActivity)
+            val model = Model.newInstance(this@MainActivity) //create instance of model
 
             // Creates inputs for reference.
             val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 190, 190, 3), DataType.FLOAT32)
 
-            val tensorImage = TensorImage(DataType.FLOAT32)
+        //converts image to byte buffer
+            val tensorImage = TensorImage(DataType.FLOAT32) //FLOAT_32 as given in model specification
             tensorImage.load(resized)
             var byteBuffer = tensorImage.buffer
 
@@ -375,16 +401,17 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             val outputs = model.process(inputFeature0)
             val outputFeature0 = outputs.outputFeature0AsTensorBuffer
 
+        //returns index of maximum probability
             max = getMax(outputFeature0.floatArray)
 
-            if (max == -1 || max == 2) {
+            if (max == -1 || max == 2) { //2 index belongs to invalid
                 tvResult.setTextColor(Color.BLACK)
                 tvResult.text = " ${getString(R.string.invalid)}"
                 name = "Invalid"
 
             } else {
                 name = cropList[max]
-                if(max==0){
+                if(max==0){ //0 to diseased
 
                     layAnim.visibility = View.VISIBLE
                     potato.setImageResource(R.drawable.potatosad)
@@ -392,7 +419,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
                     potato.animation = AnimationUtils.loadAnimation(this, R.anim.shake)
                     tvResult.setTextColor(Color.RED)
                 }
-                if(max==1){
+                if(max==1){ //1 to healthy
 
                     layAnim.visibility = View.VISIBLE
 
@@ -404,6 +431,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
                 tvResult.text = "${cropList[max]}"
             }
 
+        //close the model
             model.close()
 
 
@@ -438,7 +466,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
     class uploadAsync(var context: Context, var date: String, var list: MutableList<String>): AsyncTask<Void, Void, Boolean>(){
 
         var customProgressBar = CustomProgressBar()
-        var imageRef = FirebaseStorage.getInstance().reference.child("Images")
+        var imageRef = FirebaseStorage.getInstance().reference.child("Images") //firebase storage difference
         var check = false
         var dUrl =""
 
@@ -451,32 +479,34 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         override fun doInBackground(vararg params: Void?): Boolean {
 
             for (l in list) {
-                val file = File(context.getExternalFilesDir(l).toString()).listFiles()
+                val file = File(context.getExternalFilesDir(l).toString()).listFiles() //get list of files in the folder l
 
-                if (file.isNotEmpty()) {
+                if (file.isNotEmpty()) { //if there are images in folder then iterate through each of them and upload it
 
                     check = true
                     for (f in file) {
 
-                        var listUri = Uri.fromFile(f)
+                        var listUri = Uri.fromFile(f) //uri of file
 
                        // var i = context.contentResolver.openInputStream(listUri)
 
-                        var s = UUID.randomUUID().toString()
+                        var s = UUID.randomUUID().toString() // random string for pushing images to storage
 
+                        //upload image to firebase storage
                         imageRef.child(s).putFile(listUri).addOnSuccessListener {
-                            f.delete()
-                            val task = it.metadata!!.reference!!.downloadUrl
+                            f.delete() //delete image from device
+                            val task = it.metadata!!.reference!!.downloadUrl //it contains dowload url of image
                             task.addOnSuccessListener {
-                                dUrl = it.toString()
+                                dUrl = it.toString() //convert url to string
                                 var ref = FirebaseDatabase.getInstance().reference.child("Data")
-                                        .child(l.toUpperCase())
+                                        .child(l.toUpperCase()) //create reference to realtime database
                                 var hashMap: HashMap<String, String> = HashMap<String, String>()
 
                                 hashMap.put("Date", date)
                                 hashMap.put("Type", l)
                                 hashMap.put("Image URL", dUrl)
 
+                                //store the createdhasmap in realtime database
                                 ref.push().setValue(hashMap).addOnSuccessListener {
 
                                 }.addOnFailureListener {
@@ -495,7 +525,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             }
 
 
-            return check
+            return check //this check is returned to postExecute and if it is true it indicates that folder was not empty
         }
 
         override fun onPostExecute(result: Boolean) {
@@ -505,7 +535,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             else
                 Toast.makeText(context, context.getString(R.string.no_image_found_in_storage), Toast.LENGTH_SHORT).show()
 
-            customProgressBar.dialog.dismiss()
+            customProgressBar.dialog.dismiss() //dismiss the progressbar
 
         }
     }
@@ -523,23 +553,24 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun saveImageInDevice(ph: File) {
 
+        //check if the folder of name exists in external directory or not
         if(File(getExternalFilesDir(name!!.toUpperCase()).toString()).exists()) {
-            count = getExternalFilesDir(name!!.toUpperCase())?.let { getNumberOfFiles(it) }!!
+            count = getExternalFilesDir(name!!.toUpperCase())?.let { getNumberOfFiles(it) }!! //if yes then count number of fies in it
         }
         count++
-        myExternalFile = File(getExternalFilesDir(name!!.toUpperCase()), "${name!!.toLowerCase()}${count}.jpg")
+        myExternalFile = File(getExternalFilesDir(name!!.toUpperCase()), "${name!!.toLowerCase()}${count}.jpg") //name for file to be saved
 
 
 
-        val fileOutPutStream = FileOutputStream(myExternalFile)
+        val fileOutPutStream = FileOutputStream(myExternalFile) //output stream is used to write something to the file
 
         try {
             val bitmap = BitmapFactory.decodeFile(ph.absolutePath)
 
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutPutStream)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutPutStream)// bitmap is written on the file utput stream
 
-            fileOutPutStream.close()
-            ph.delete()
+            fileOutPutStream.close() //close the stream
+            ph.delete() //delete ph cause file is now permanently saved in its correct storage
 
 
             Toast.makeText(this, getString(R.string.saved_device_toast), Toast.LENGTH_SHORT).show()
@@ -554,6 +585,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 
+        //to place the lang change option
         val inflater = menuInflater
         inflater.inflate(R.menu.main_menu, menu)
 
@@ -571,6 +603,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
                 changeLang("hi", this)
                 saveLanguage("hin")
                 customDialog.dismiss()
+                //start again the present activity with changed language
                 onStart()
                 val i = Intent(this, MainActivity::class.java)
                 this!!.overridePendingTransition(0, 0)
@@ -616,6 +649,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
     }
 
     fun setLayout(str: String){
+
         if(str == "eng"){
             changeLang("en", this)
 
@@ -627,8 +661,6 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         ibUpload.text = getString(R.string.upload_btn)
         ibSave.text = getString(R.string.save_offline_btn)
         tvResult.text = getString(R.string.health_status_text)
-
-
     }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
