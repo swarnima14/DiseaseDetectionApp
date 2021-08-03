@@ -2,7 +2,6 @@ package com.app.potatodiseasedetection
 
 
 import android.Manifest
-import android.animation.ObjectAnimator
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
@@ -28,7 +27,6 @@ import androidx.core.content.FileProvider
 import com.app.potatodiseasedetection.ml.Model
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
-import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.dialog_custom.*
 import kotlinx.coroutines.CoroutineScope
@@ -110,7 +108,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             layAnim.visibility = View.GONE
 
                 if(isPermissionGranted())
-                takeWritePermission()
+                openGallery()
             else{
                 takePermission()
                 }
@@ -166,8 +164,6 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
                     Toast.makeText(this, getString(R.string.no_image_sel_toast), Toast.LENGTH_SHORT).show()
             }
 
-
-
             ivImg.setImageResource(R.drawable.noimage2)
             tvResult.text = ""
         }
@@ -183,29 +179,11 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
 
 
 
-    private fun takeWritePermission() {
-        /*if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            != PackageManager.PERMISSION_GRANTED) {
-
-            // Permission is not granted
-            // Should we show an explanation?
-            (ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ))
-            // Show an explanation to the user *asynchronously* -- don't block
-            // this thread waiting for the user's response! After the user
-            // sees the explanation, try again to request the permission.
-        }
-
-        else {*/
-            // Permission has already been granted
+    private fun openGallery() {
 
             pressGal = false
             ivImg.setImageResource(R.drawable.noimage2)
-       // noimgAnim.setAnimation("noimage.json")
-        tvResult.text = ""
+            tvResult.text = ""
 
             var intent: Intent = Intent(Intent.ACTION_GET_CONTENT)
             intent.type = "image/*"
@@ -215,28 +193,14 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
     }
 
     private fun takePermission() {
-        /*if(Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
-            try {
-                val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                intent.addCategory("android.intent.category.DEFAULT")
-                intent.setData(Uri.parse(String.format("package:%s", applicationContext.packageName)))
-                startActivityForResult(intent, 1)
-            }catch (e: Exception){
-                val intent = Intent()
-                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                startActivityForResult(intent, 1)
-            }
-        }
-        else{*/
+
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), 2)
         
     }
 
     private fun isPermissionGranted(): Boolean {
-        /*if(Build.VERSION.SDK_INT == Build.VERSION_CODES.R)
-            return Environment.isExternalStorageManager()
-        else{*/
+
             val readExternalStoragePermission = ContextCompat.checkSelfPermission(this,
                     arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,
                             Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE).toString())
@@ -251,11 +215,11 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         if(grantResults.size > 0 && requestCode ==2){
             val readExtStorage = grantResults[0] == PackageManager.PERMISSION_GRANTED
             if(readExtStorage){
-                //Toast.makeText(this, "Permissions granted now.", Toast.LENGTH_SHORT).show()
+
                 if(btnCam)
                 openCamera()
                 if(btnGal)
-                    takeWritePermission()
+                    openGallery()
             }
             else{
                 takePermission()
@@ -269,7 +233,7 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
         pressCam = false
 
         ivImg.setImageResource(R.drawable.noimage2)
-tvResult.text = ""
+        tvResult.text = ""
 
         var camIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
 
@@ -283,7 +247,7 @@ tvResult.text = ""
         fileProvider = FileProvider.getUriForFile(this, "com.app.potatodiseasedetection.fileprovider", photoFile!!)
         camIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileProvider)
 
-        pfile = photoFile
+        //pfile = photoFile
 
         startActivityForResult(camIntent, 99)
 
@@ -297,16 +261,15 @@ tvResult.text = ""
      override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-         if(resultCode == Activity.RESULT_OK){
+         /*if(resultCode == Activity.RESULT_OK){
              if(requestCode == 1){
                  if(Build.VERSION.SDK_INT == Build.VERSION_CODES.R){
                      if(Environment.isExternalStorageManager()){
                          Toast.makeText(this, "Permissions Granted.", Toast.LENGTH_SHORT).show()
-                        // openCamera()
                      }
                  }
              }
-         }
+         }*/
 
          if(requestCode == 99 && resultCode == Activity.RESULT_OK) {
 
@@ -341,35 +304,17 @@ tvResult.text = ""
              uri = Uri.fromFile(photoFile)
              bitmap = BitmapFactory.decodeFile(photoFile.path)
 
+             predictName()
 
-
-             CoroutineScope(Dispatchers.Main).launch {
-                 predictName()
-                 //predictAsync(this@MainActivity, bitmap, tvResult).execute()
-                 //downloadCustomModel()
-
-             }
-
-
-             try {
-
-                 //predictAsync(this, bitmap, tvResult).execute()
-             }catch (e: Exception){
-                 Toast.makeText(this, "${getString(R.string.error_toast)} ${e.message}", Toast.LENGTH_LONG).show()
-             }
          }
 
          if(resultCode == RESULT_OK && requestCode == 97 && data!=null) {
 
-             var fadeAnim = AnimationUtils.loadAnimation(this, R.anim.fade)
              pressGal = true
-
 
              ivImg.setImageURI(data!!.data)
              uri = data!!.data
 
-
-            // photoFile = File(uri.toString())
              val s = FileUtil.getPath(uri!!, this)
              photoFile = File(s)
 
@@ -393,29 +338,12 @@ tvResult.text = ""
 
              predictName()
 
-             CoroutineScope(Dispatchers.Main).launch {
-                // predictName()
-                 //predictAsync(this@MainActivity, bitmap, tvResult).execute()
-                 //downloadCustomModel()
-
-             }
-
-
-             try {
-
-                 //predictAsync(this, bitmap, tvResult).execute()
-             }catch (e: Exception){
-                 Toast.makeText(this, "${getString(R.string.error_toast)} ${e.message}", Toast.LENGTH_LONG).show()
-             }
-
          }
 
     }
 
     private  fun predictName(){
 
-
-      //  withContext(Dispatchers.Main) {
             val a = FileUtil.getPath(uri!!, applicationContext)
 
             bitmap = BitmapFactory.decodeFile(File(a.toString()).absolutePath)
@@ -432,81 +360,54 @@ tvResult.text = ""
 
             var resized: Bitmap = Bitmap.createScaledBitmap(bitmap, 190, 190, true)
 
-             // output = convertBitmapToByteBuffer(resized)
-
             val model = Model.newInstance(this@MainActivity)
 
             // Creates inputs for reference.
             val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 190, 190, 3), DataType.FLOAT32)
 
-           // inputFeature0.loadBuffer(output!!)
-        val tensorImage = TensorImage(DataType.FLOAT32)
-        tensorImage.load(resized)
-        var byteBuffer = tensorImage.buffer
-        inputFeature0.loadBuffer(byteBuffer)
+            val tensorImage = TensorImage(DataType.FLOAT32)
+            tensorImage.load(resized)
+            var byteBuffer = tensorImage.buffer
+
+            inputFeature0.loadBuffer(byteBuffer)
 
             // Runs model inference and gets result.
             val outputs = model.process(inputFeature0)
             val outputFeature0 = outputs.outputFeature0AsTensorBuffer
 
-
-
-/*val tbuffer = TensorImage.fromBitmap(resized)
-            var byteBuffer = tbuffer.buffer
-            inputFeature0.loadBuffer(byteBuffer)
-            val outputs = model.process(inputFeature0)
-            var outputFeature0 = outputs.outputFeature0AsTensorBuffer*/
-
             max = getMax(outputFeature0.floatArray)
-
 
             if (max == -1 || max == 2) {
                 tvResult.setTextColor(Color.BLACK)
                 tvResult.text = " ${getString(R.string.invalid)}"
                 name = "Invalid"
 
-
-
-
-
             } else {
                 name = cropList[max]
                 if(max==0){
 
-                    var lottieAnimationFile = "wrong2.json"
                     layAnim.visibility = View.VISIBLE
                     potato.setImageResource(R.drawable.potatosad)
-                  //  shakeAnim(potato)
-                  //  potato.animation = AnimationUtils.loadAnimation(this, R.anim.scale_up)
 
                     potato.animation = AnimationUtils.loadAnimation(this, R.anim.shake)
-                    //setStepContent(lottieAnimationFile)
                     tvResult.setTextColor(Color.RED)
                 }
                 if(max==1){
 
-                    var lottieAnimationFile = "right2.json"
                     layAnim.visibility = View.VISIBLE
+
                     potato.setImageResource(R.drawable.potatohappy)
                     potato.animation = AnimationUtils.loadAnimation(this, R.anim.scale_up)
-                    //setStepContent(lottieAnimationFile)
+
                     tvResult.setTextColor(Color.GREEN)
                 }
                 tvResult.text = "${cropList[max]}"
             }
-          //  ivImg.setImageBitmap(getOutputImage())
+
             model.close()
 
 
     }
-
-    /*private fun shakeAnim(potato: CircleImageView?) {
-        ObjectAnimator
-                .ofFloat(potato, "translationX", 0, 25, -25, 25, -25,15, -15, 6, -6, 0)
-                .setDuration(2500)
-                .start();
-
-    }*/
 
     fun getMax(arr: FloatArray): Int{
 
@@ -516,7 +417,7 @@ tvResult.text = ""
         for (i in 0..2) {
 
 
-            if (arr[i] > min) { // can be changed
+            if (arr[i] > min) {
 
                 ind = i
                 min = arr[i]
@@ -559,9 +460,10 @@ tvResult.text = ""
 
                         var listUri = Uri.fromFile(f)
 
-                        var i = context.contentResolver.openInputStream(listUri)
+                       // var i = context.contentResolver.openInputStream(listUri)
 
                         var s = UUID.randomUUID().toString()
+
                         imageRef.child(s).putFile(listUri).addOnSuccessListener {
                             f.delete()
                             val task = it.metadata!!.reference!!.downloadUrl
@@ -621,8 +523,6 @@ tvResult.text = ""
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun saveImageInDevice(ph: File) {
 
-
-
         if(File(getExternalFilesDir(name!!.toUpperCase()).toString()).exists()) {
             count = getExternalFilesDir(name!!.toUpperCase())?.let { getNumberOfFiles(it) }!!
         }
@@ -660,14 +560,9 @@ tvResult.text = ""
         return true
     }
 
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
-
         if(item.itemId == R.id.menuReset){
-            // Toast.makeText(context, "reset clicked", Toast.LENGTH_SHORT).show()
-            /*val intent = Intent(activity, LangSelActivity::class.java)
-            startActivity(intent)*/
 
             val customDialog = Dialog(this)
 
@@ -738,9 +633,6 @@ tvResult.text = ""
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         if(item!!.itemId == R.id.menuReset){
-            // Toast.makeText(context, "reset clicked", Toast.LENGTH_SHORT).show()
-            /*val intent = Intent(activity, LangSelActivity::class.java)
-            startActivity(intent)*/
 
             val customDialog = Dialog(this)
 
@@ -774,14 +666,5 @@ tvResult.text = ""
         }
         return true
     }
-
-    /*override fun onStart() {
-        super.onStart()
-        if(isPermissionGranted())
-            Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
-        else{
-            takePermission()
-        }
-    }*/
 
 }

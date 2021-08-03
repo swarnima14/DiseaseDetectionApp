@@ -22,7 +22,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:background="#141414"
-
         style="@style/Widget.AppCompat.PopupMenu">
 
         <LinearLayout
@@ -47,16 +46,6 @@
         </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
-
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.01"
-        app:layout_constraintTop_toBottomOf="@id/appBar"
-        tools:ignore="NotSibling" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -156,15 +145,6 @@
 
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <!--<com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/rightAnim"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        app:lottie_autoPlay="true"
-        app:lottie_fileName="right.json"
-        app:lottie_loop="true"
-        android:alpha="1" />-->
 
 
 

@@ -52,12 +52,12 @@ class LangSelActivity : AppCompatActivity() {
 
     fun changeLang(str: String, context: Context){
 
-        val locale = Locale(str)
-        Locale.setDefault(locale)
+        val locale = Locale(str) //constructs a locale from str
+        Locale.setDefault(locale) //sets it as default locale
         val configuration = context.resources.configuration
         configuration.locale = locale
-        context.createConfigurationContext(configuration)
-        context.resources.updateConfiguration(configuration, context.resources.displayMetrics)
+        context.createConfigurationContext(configuration) //load resources with new configuration
+        context.resources.updateConfiguration(configuration, context.resources.displayMetrics) //store resources with new configuration
 
     }
 
