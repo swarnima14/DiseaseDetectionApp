@@ -25,6 +25,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.app.potatodiseasedetection.ml.Model
+import com.app.potatodiseasedetection.ml.ModelDisease
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_main.*
@@ -383,12 +384,12 @@ class MainActivity : AppCompatActivity(), Toolbar.OnMenuItemClickListener {
             val inpString = application.assets.open(fileName).bufferedReader().use { it.readText() } //opens the file fileName and read text and convert it into string
             val cropList = inpString.split("\n") //split string at new line to get array of strings
 
-            var resized: Bitmap = Bitmap.createScaledBitmap(bitmap, 190, 190, true) //resize bitmap according to the image specifications given in model
+            var resized: Bitmap = Bitmap.createScaledBitmap(bitmap, 210, 210, true) //resize bitmap according to the image specifications given in model
 
-            val model = Model.newInstance(this@MainActivity) //create instance of model
+            val model = ModelDisease.newInstance(this@MainActivity) //create instance of model
 
             // Creates inputs for reference.
-            val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 190, 190, 3), DataType.FLOAT32)
+            val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 210, 210, 3), DataType.FLOAT32)
 
         //converts image to byte buffer
             val tensorImage = TensorImage(DataType.FLOAT32) //FLOAT_32 as given in model specification
